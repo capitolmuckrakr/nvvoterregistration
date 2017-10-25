@@ -31,4 +31,18 @@ export INSTANCEID="${INSTANCEID}"
 
 export AWS_PG_HOST="${ENDPOINT}"
 
+export SGID="${SGID}"
+
+echo "Type 'terminate' to shut down and delete the database."
+
+function terminate() {
+                      aws rds delete-db-instance --db-instance-identifier $INSTANCEID --skip-final-snapshot;
+                      echo "terminating $INSTANCEID ...";
+                      aws rds wait db-instance-deleted --db-instance-identifier $INSTANCEID;
+                      aws ec2 delete-security-group --group-id $SGID;
+                      echo $INSTANCEID terminated
+}
+
+export -f terminate
+
 exec $SHELL -i
